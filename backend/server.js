@@ -1,7 +1,7 @@
-// Load environment variables
 import 'dotenv/config';
 import dotenv from 'dotenv';
 dotenv.config();
+
 import express from 'express';
 import db from './utils/database/db.js';
 import bodyParser from 'body-parser';
@@ -12,10 +12,11 @@ import faculityRouter from './utils/routes/faculity.routes.js';
 import courseRouter from './utils/routes/course.routers.js';
 import studentRouter from './utils/routes/student.routes.js';
 import cookieParser from 'cookie-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-
-
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -26,7 +27,9 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(cookieParser());
 
-// Routes
+// Serve static admin profile images
+app.use("/admin", express.static(path.join(__dirname, "public/admin")));
+
 // Routes
 app.use("/api/v1", adminRouter);
 app.use("/api/v1", faculityRouter);
@@ -43,8 +46,6 @@ app.listen(port, () => {
     console.log(`🚀 Server running at http://localhost:${port}`);
     db(); // MongoDB connect
 });
-
-
 
 // Optional lodash demos (can remove in production)
 const arr = [1, 2, 3, 4, 5, 6, 6];

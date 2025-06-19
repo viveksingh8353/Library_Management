@@ -1,38 +1,58 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+// pages/AdminLogin.jsx
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { loginAdmin } = useAuth();
   const navigate = useNavigate();
+  const [form, setForm] = useState({ email: "", password: "" });
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/admin/login', {
-        email,
-        password
-      });
-
-      // Store admin info in localStorage or context
-      localStorage.setItem('adminToken', res.data.token); // optional
-      // Redirect to dashboard
-      navigate('/dashboard');
+      const res = await axios.post("http://localhost:5000/api/v1/admin/login", form);
+      if (res.data?.token) {
+        loginAdmin(res.data.token, res.data.data); // ✅ FIXED: admin info is inside `data`
+        navigate("/admin-dashboard"); // ✅ make sure this route exists
+      } else {
+        alert("Login failed ❌");
+      }
     } catch (err) {
-      alert('Login failed!');
+      alert("Login error ❌");
+      console.error(err);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <form onSubmit={handleLogin} className="bg-white shadow p-6 rounded space-y-4">
-        <h2 className="text-xl font-bold text-center">Admin Login</h2>
-        <input type="email" placeholder="Admin Email" className="border p-2 w-full"
-          value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input type="password" placeholder="Admin Password" className="border p-2 w-full"
-          value={password} onChange={(e) => setPassword(e.target.value)} />
-        <button type="submit" className="bg-blue-600 text-white w-full p-2 rounded">
+    <div
+      className="min-h-screen bg-cover bg-center flex items-center justify-center"
+      style={{ backgroundImage: `url('/loginBG.jpg')` }}
+    >
+      <form
+        onSubmit={handleLogin}
+        className="bg-white bg-opacity-80 p-10 rounded-2xl shadow-xl max-w-sm w-full"
+      >
+        <h2 className="text-2xl font-bold mb-4 text-center">Admin Login</h2>
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full p-2 mb-3 border rounded"
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full p-2 mb-3 border rounded"
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          required
+        />
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+        >
           Login
         </button>
       </form>

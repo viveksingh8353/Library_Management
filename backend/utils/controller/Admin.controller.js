@@ -37,7 +37,11 @@ export const adminCreate = async (req, res) => {
     });
 
     const savedAdmin = await adminCreate.save();
-    const token = jwt.sign({ adminId: savedAdmin._id }, process.env.SECURTY_KEY, { expiresIn: "4d" });
+    const token = jwt.sign(
+      { adminId: savedAdmin._id },
+      process.env.SECURITY_KEY, // ✅ Fixed spelling
+      { expiresIn: "4d" }
+    );
 
     return handleError(res, 201, "Admin created successfully", savedAdmin, token);
   } catch (err) {
@@ -57,7 +61,12 @@ export const loginAdmin = async (req, res) => {
     const isMatch = await bcrypt.compare(password, admin.adminPassword);
     if (!isMatch) return handleError(res, 401, "Incorrect password");
 
-    const token = jwt.sign({ adminId: admin._id }, process.env.SECURTY_KEY, { expiresIn: "4d" });
+    const token = jwt.sign(
+      { adminId: admin._id },
+      process.env.SECURITY_KEY, // ✅ Fixed spelling
+      { expiresIn: "4d" }
+    );
+
     return handleError(res, 200, "Login successful", admin, token);
   } catch (err) {
     return handleError(res, 500, `Login error: ${err.message}`);
